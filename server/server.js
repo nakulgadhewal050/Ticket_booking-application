@@ -24,8 +24,8 @@ app.get('/', (req, res) => {
 });
 
 app.use("/api/inngest", serve({
-    client: inngest, 
-    functions
+    client: inngest,
+    functions: functions,
 }));
 
 app.listen(PORT, () => {

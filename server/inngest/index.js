@@ -3,11 +3,7 @@ import User from "../models/User.js";
 import "dotenv/config";
 
 
-export const inngest = new Inngest({
-  id: "movie-ticket-booking",
-  eventKey: process.env.INNGEST_EVENT_KEY,
-  signingKey: process.env.INNGEST_SIGNING_KEY,
-});
+export const inngest = new Inngest({ id: "movie-ticket-booking" });
 
 //Inngest Functions to save user data to a database
 
@@ -58,7 +54,7 @@ const syncUserUpdation = inngest.createFunction(
             name: first_name + " " + last_name,
             image: image_url
         }
-        await User.findByIdAndUpdate(id,userData);
+        await User.findByIdAndUpdate(id, userData);
     },
 );
 
@@ -67,5 +63,5 @@ export const functions = [
     syncUserCreation,
     syncUserDeletion,
     syncUserUpdation,
-    
+
 ];
