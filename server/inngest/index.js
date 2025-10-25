@@ -1,10 +1,12 @@
 import { Inngest } from "inngest";
 import User from "../models/User.js";
+import "dotenv/config";
+
 
 export const inngest = new Inngest({
   id: "movie-ticket-booking",
-  INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
-  INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
+  eventKey: process.env.INNGEST_EVENT_KEY,
+  signingKey: process.env.INNGEST_SIGNING_KEY,
 });
 
 //Inngest Functions to save user data to a database
