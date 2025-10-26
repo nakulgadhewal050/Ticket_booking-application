@@ -1,8 +1,10 @@
 import { Inngest } from "inngest";
 import User from "../models/User.js";
 import "dotenv/config";
+import connectDB from "../configs/db.js";
 
 
+await connectDB();
 export const inngest = new Inngest({ id: "movie-ticket-booking" });
 
 //Inngest Functions to save user data to a database
