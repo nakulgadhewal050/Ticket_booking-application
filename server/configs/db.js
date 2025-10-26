@@ -7,7 +7,7 @@ const connectDB = async () => {
         )
         await mongoose.connect(`${process.env.MONGODB_URI}/movie`);
     } catch (error) {
-        console.error("MongoDB connection failed:", error);
+        console.error("MongoDB connection failed:", error.message);
     }
 }
 
