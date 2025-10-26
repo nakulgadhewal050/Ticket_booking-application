@@ -7,8 +7,7 @@ export const inngest = new Inngest({ id: "movie-ticket-booking" });
 
 //Inngest Functions to save user data to a database
 
-const syncUserCreation = inngest.createFunction(
-
+const syncUserCreation = inngest.createFunction(                                          
     { id: "sync-user-from-clerk" },
     { event: "clerk/user.created" },
 
@@ -21,9 +20,9 @@ const syncUserCreation = inngest.createFunction(
             image: image_url
         }
         await User.create(userData);
-    },
+    }
 );
-
+      
 // Inngest Functions to delete user data from database
 
 const syncUserDeletion = inngest.createFunction(
@@ -34,8 +33,7 @@ const syncUserDeletion = inngest.createFunction(
     async ({ event }) => {
         const { id } = event.data;
         await User.findByIdAndDelete(id);
-
-    },
+    }
 );
 
 // Inngest Functions to update user data in database
@@ -55,7 +53,7 @@ const syncUserUpdation = inngest.createFunction(
             image: image_url
         }
         await User.findByIdAndUpdate(id, userData);
-    },
+    }
 );
 
 
