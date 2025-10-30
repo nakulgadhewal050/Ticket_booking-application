@@ -9,6 +9,7 @@ import showRouter from './routes/showRoutes.js';
 import bookingRouter from './routes/bookingRoute.js';
 import adminRouter from './routes/adminRoute.js';
 import userRouter from './routes/userRoute.js';
+import { stripeWebhooks } from './controllers/stripeWebhook.js';
 
 
 
@@ -16,6 +17,9 @@ const app = express();
 const PORT = 3000
 
 await connectDB();
+
+//Stripe webhooks route
+app.use('/api/stripe', express.raw({type: 'application/json'}), stripeWebhooks)
 
 //Middleware
 app.use(clerkMiddleware());

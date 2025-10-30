@@ -96,8 +96,9 @@ function SeatLayout() {
         headers: { Authorization: `Bearer ${await getToken()}` }
       });
       if(data.success){
-        toast.success("Tickets booked successfully", {icon: '🎉' });
-        navigate('/mybookings');
+        window.location.href = data.url;
+      }else {
+        toast.error(data.message)
       }
    } catch (error) {
     console.log("error in book tickets", error)
