@@ -16,6 +16,8 @@ export const AppProvider = ({ children }) => {
     const [shows, setShows] = useState([]);
     const [favoriteMovies, setFavoriteMovies] = useState([]);
 
+    const image_base_url = import.meta.env.VITE_TMDB_IMAGE_URL;
+
     const { user } = useUser();
     const { getToken } = useAuth();
     const location = useLocation();
@@ -62,7 +64,7 @@ const fetchIsAdmin = async () => {
             })
 
             if (data.success) {
-                setFavoriteMovies(data.favorites);
+                setFavoriteMovies(data.movies );
             } else {
                 toast.error(data.message);
             }
@@ -90,7 +92,7 @@ const fetchIsAdmin = async () => {
     const value = {
         axios, fetchIsAdmin, favoriteMovies,
         fetchFavoriteMovies, user, getToken,
-        navigate, isAdmin, shows,
+        navigate, isAdmin, shows, image_base_url,
     }
 
     return (

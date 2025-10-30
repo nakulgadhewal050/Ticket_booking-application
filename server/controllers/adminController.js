@@ -32,59 +32,59 @@ export const isAdmin = async (req, res) => {
 // API to get dashboard data
 
 export const getDashboardData = async (req, res) => {
-    try {
-        const bookings = await Booking.find({ isPaid: true });
-        const activeShows = await Show.find().populate('movie');
+  try {
+    const bookings = await Booking.find({ isPaid: true });
+    const activeShows = await Show.find().populate('movie');
 
-        const totalUsers = await User.countDocuments();
+    const totalUsers = await User.countDocuments();
 
-        const dashboardData = {
-            totalBookings: bookings.length,
-            totalRevenue: bookings.reduce((acc, booking) => acc + booking.amount, 0),
-            activeShows,
-            totalUsers,
-        }
-
-        res.json({ success: true, dashboardData });
-
-    } catch (error) {
-        console.error(error);
-        res.json({ success: false, message: "Failed to fetch dashboard data", error: error.message });
-
+    const dashboardData = {
+      totalBookings: bookings.length,
+      totalRevenue: bookings.reduce((acc, booking) => acc + booking.amount, 0),
+      activeShows,
+      totalUsers,
     }
+
+    res.json({ success: true, dashboardData });
+
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: "Failed to fetch dashboard data", error: error.message });
+
+  }
 }
 
 // API to get all shows
 
 export const getAllShows = async (req, res) => {
-    try {
+  try {
 
-        const shows = (await Show.find().populate('movie')).toSorted({ showDateTime: 1 });
-        res.json({ success: true, shows })
+    const shows = await Show.find()
+      .populate('movie')
+      .sort({ showDateTime: 1 });
+    res.json({ success: true, shows })
 
-    } catch (error) {
-        console.error(error);
-        res.json({ success: false, message: error.message });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: error.message });
 
-    }
-
-
+  }
 }
 
 
 // API to get all bookings
 
 export const getAllBookings = async (req, res) => {
-    try {
-          const bookings = await Booking.find().populate('user').populate({
-            path: 'show',
-            populate: { path: 'movie' }
-          }).sort({ createdAt: -1 });
- 
-          res.json({ success: true, bookings });
+  try {
+    const bookings = await Booking.find().populate('user').populate({
+      path: 'show',
+      populate: { path: 'movie' }
+    }).sort({ createdAt: -1 });
 
-    } catch (error) {
-        console.error(error);
-        res.json({ success: false, message: error.message });
-    }
+    res.json({ success: true, bookings });
+
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: error.message });
+  }
 }

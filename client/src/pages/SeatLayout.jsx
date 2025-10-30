@@ -6,8 +6,11 @@ import { ArrowRightIcon, ClockIcon } from 'lucide-react';
 import isoTimeFormat from '../lib/isoTimeFormat';
 import BlurCircle from '../components/BlurCircle';
 import toast from 'react-hot-toast';
+import { useAppContext } from '../context/AppContext';
 
 function SeatLayout() {
+
+  const {axios, getToken, user} = useAppContext();
 
   const groupRows = [["A", "B"], ["C", "D"], ["E", "F"], ["G", "H"], ["I", "J"]];
 
@@ -15,16 +18,20 @@ function SeatLayout() {
   const [selectedSeats, setSelectedSeats] = useState([])
   const [selectedTime, setSelectedTime] = useState(null)
   const [show, setShow] = useState(null)
+  const [occupiedSeats, setOccupiedSeats] = useState([])
 
   const navigate = useNavigate();
 
   const getShow = async () => {
-    const show = dummyShowsData.find(show => show._id === id)
-    if (show) {
-      setShow({
-        movie: show,
-        dateTime: dummyDateTimeData
-      })
+    try {
+      const {data} = await axios.get(`/api/show/${id}`)
+      if(data.success){
+        setShow(data)
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      console.log("error in getShow", error)
     }
   }
 
@@ -35,6 +42,10 @@ function SeatLayout() {
 
     if (!selectedSeats.includes(seatId) && selectedSeats.length >= 5) {
       return toast.error("You can select maximum 5 seats")
+    }
+
+    if(occupiedSeats.includes(seatId)){
+      return toast.error("Seat already Booked")
     }
 
     setSelectedSeats(prev => prev.includes(seatId) ? prev.filter(seat => seat !== seatId)
@@ -49,7 +60,9 @@ function SeatLayout() {
           const seatId = `${row}${i + 1}`;
           return (
             <button key={seatId} onClick={() => handleSeatClick(seatId)}
-              className={`h-8 w-8 rounded border border-primary/60 cursor-pointer ${selectedSeats.includes(seatId) && "bg-primary text-white"}`}>
+              className={`h-8 w-8 rounded border border-primary/60 cursor-pointer 
+              ${selectedSeats.includes(seatId) && "bg-primary text-white"} 
+              ${occupiedSeats.includes(seatId) && "opacity-50"}`}>
               {seatId}
             </button>
           );
@@ -59,9 +72,47 @@ function SeatLayout() {
     </div>
   )
 
+  const getOccupiedSeats = async () => {
+    try {
+      const {data} = await axios.get(`/api/booking/seats/${selectedTime.showId}`)
+      if(data.success){
+        setOccupiedSeats(data.occupiedSeats)
+      }else{
+        toast.error(data.message)
+      }
+
+    } catch (error) {
+      console.log("error in getoccupiedseats", error)
+    }
+  }
+
+  const bookTickets = async() => {
+   try {
+     if(!user) return toast.error("Please login to book tickets");
+
+      if(!selectedTime || !selectedSeats) return toast.error("Please select time and seats");
+
+      const {data} = await axios.post(`/api/booking/create_booking`,{showId: selectedTime.showId, selectedSeats},{
+        headers: { Authorization: `Bearer ${await getToken()}` }
+      });
+      if(data.success){
+        toast.success("Tickets booked successfully", {icon: '🎉' });
+        navigate('/mybookings');
+      }
+   } catch (error) {
+    console.log("error in book tickets", error)
+   }
+  }
+
   useEffect(() => {
     getShow()
   }, [])
+
+  useEffect(()=> {
+   if(selectedTime){
+    getOccupiedSeats()
+   }
+  },[selectedTime])
 
   return show ? (
     <div className='flex flex-col md:flex-row px-6 md:px-16 lg:px-40 py-30 md:pt-50'>
@@ -104,18 +155,7 @@ function SeatLayout() {
 
         <button
           className="flex items-center gap-1 mt-20 px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer active:scale-95"
-          onClick={() => {
-            if (!selectedTime) {
-              toast.error("Please select a time slot");
-              return;
-            }
-            if (selectedSeats.length === 0) {
-              toast.error("Please select at least one seat");
-              return;
-            }
-            navigate('/mybookings');
-            scrollTo(0, 0);
-          }}>
+          onClick={bookTickets}>
           Proceed to Checkout
           <ArrowRightIcon strokeWidth={3} className="w-4 h-4" />
         </button>

@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { ChartLineIcon, CircleDollarSignIcon, PlayCircleIcon, StarIcon, UserIcon } from 'lucide-react';
 import { dummyDashboardData } from '../../assets/assets';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import Loading from '../../components/Loading';
 import Title from '../../components/admin/Title.jsx';
 import BlurCircle from '../../components/BlurCircle.jsx';
 import { dateFormat } from '../../lib/dateFormat.js';
+import { useAppContext } from '../../context/AppContext.jsx';
 
 
 function Dashboard() {
+
+  const { axios, getToken, user, image_base_url } = useAppContext();
+
   const currency = import.meta.env.VITE_CURRENCY
 
   const [dashboardData, setDashboardData] = useState({
@@ -27,13 +31,28 @@ function Dashboard() {
   ]
 
   const fetchDashboardData = async () => {
-    setDashboardData(dummyDashboardData)
-    setLoading(false);
+    try {
+      const { data } = await axios.get('/api/admin/dashboard', {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      })
+      if (data.success) {
+        setDashboardData(data.dashboardData);
+        setLoading(false);
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      toast.error("Failed to fetch dashboard data", { icon: '⚠️' });
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchDashboardData();
-  }, [])
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user])
 
   return !loading ? (
     <>
@@ -57,14 +76,14 @@ function Dashboard() {
       <p className='mt-10 text-lg font-medium'>Active Shows</p>
       <div className='relative flex flex-wrap gap-6 mt-4 max-w-5xl'>
         <BlurCircle top='100px' left='-10%' />
-        {dashboardData.activeShows.map((show,index)=>(
+        {dashboardData.activeShows.map((show, index) => (
           <div key={index} className='w-55 rounded-lg overflow-hidden h-full pb-3 bg-primary/10 border border-primary/20 hover:-translate-y-1 transition duration-300'>
-            <img src={show.movie.poster_path} alt="" className='h-60 w-full object-cover'/>
+            <img src={image_base_url + show.movie.poster_path} alt="" className='h-60 w-full object-cover' />
             <p className='font-medium p-2 truncate'>{show.movie.title}</p>
             <div className='flex items-center justify-between px-2'>
               <p className='text-lg  font-medium'>{currency} {show.showPrice}</p>
               <p className='flex items-center gap-1 text-sm text-gray-400 mt-1 pr-1'>
-                <StarIcon className='w-4 h-4 text-primary fill-primary'/>
+                <StarIcon className='w-4 h-4 text-primary fill-primary' />
                 {show.movie.vote_average.toFixed(1)}
               </p>
             </div>

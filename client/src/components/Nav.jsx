@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets.js'
 import { MenuIcon, SearchIcon, TicketPlus, XIcon } from 'lucide-react'
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react'
+import { useAppContext } from '../context/AppContext.jsx'
 
 function Nav() {
+    const {favoriteMovies} = useAppContext();
     const [menuOpen, setMenuOpen] = useState(false)
     const { user } = useUser()
     const { openSignIn } = useClerk()
@@ -27,6 +29,8 @@ function Nav() {
         window.addEventListener('scroll', handleScroll)
         return () => window.removeEventListener('scroll', handleScroll)
     }, [lastScrollY])
+
+   
 
     return (
         <div className={`fixed top-0 left-0 z-50 w-full flex items-center justify-between 
@@ -54,7 +58,7 @@ function Nav() {
                 <Link to='/movies' onClick={() => setMenuOpen(false)}>Movies</Link>
                 <Link to='/theaters' onClick={() => setMenuOpen(false)}>Theaters</Link>
                 <Link to='/releases' onClick={() => setMenuOpen(false)}>Releases</Link>
-                <Link to='/favourite' onClick={() => setMenuOpen(false)}>Favorites</Link>
+                <Link to='/favourite' onClick={() => {scroll(0,0); setMenuOpen(false)}}>Favorites</Link>
             </div>
 
 

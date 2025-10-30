@@ -3,8 +3,12 @@ import { dummyShowsData } from '../../assets/assets';
 import Loading from "../../components/Loading";
 import Title from '../../components/admin/Title';
 import dateFormate from "../../lib/dateFormat.js"
+import { useAppContext } from '../../context/AppContext';
 
 function ListShows() {
+
+  const { axios, getToken, user } = useAppContext();
+
   const currency = import.meta.env.VITE_CURRENCY
 
   const [shows, setShows] = useState([]);
@@ -12,16 +16,10 @@ function ListShows() {
 
   const getAllShows = async () => {
     try {
-      setShows([{
-        movie: dummyShowsData[0],
-        showDateTime: "2025-08-30T02:30:000Z",
-        showPrice: 59,
-        occupiedSeats: {
-          A1: "user_1",
-          B1: "user_2",
-          C1: "user_3",
-        }
-      }]);
+      const {data} = await axios.get("/api/admin/all_shows", {
+        headers: { Authorization: `Bearer ${await getToken()}` }
+      });
+      setShows(data.shows);
       setLoading(false);
     } catch (error) {
       console.error(error)
@@ -29,8 +27,10 @@ function ListShows() {
   }
 
   useEffect(() => {
-    getAllShows();
-  }, [])
+    if(user){
+      getAllShows();
+    } 
+  }, [user])
 
   return !loading ? (
     <>
@@ -46,7 +46,7 @@ function ListShows() {
             </tr>
           </thead>
           <tbody className='text-sm font-light'>
-            {shows.map((show, index) => (
+            {shows?.map((show, index) => (
               <tr key={index} className='border-b border-primary/10 bg-primary/5 even:bg-primary/10'>
                 <td className="p-2 min-w-45 pl-5">{show.movie.title}</td>
                 <td className="p-2">{dateFormate(show.showDateTime)}</td>
