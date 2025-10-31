@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { ChartLineIcon, CircleDollarSignIcon, PlayCircleIcon, StarIcon, UserIcon } from 'lucide-react';
-import { dummyDashboardData } from '../../assets/assets';
 import toast, { Toaster } from 'react-hot-toast';
 import Loading from '../../components/Loading';
 import Title from '../../components/admin/Title.jsx';
