@@ -4,6 +4,7 @@
 import stripe from "stripe"
 import Booking from "../models/Booking.js";
 import Show from "../models/Show.js";
+import { inngest } from "../inngest/index.js";
 
 export const checkSeatAvailability = async (showId, selectedSeats) => {
     try {
@@ -87,7 +88,7 @@ export const createBooking = async (req, res) => {
 
         //Run inngest sheduler function to check payment status after 10 minutes
         await inngest.send({
-            name: 'app/checkpaymet',
+            name: 'app/checkpayment',
             data: {
                 bookingId: booking._id.toString()
             }
