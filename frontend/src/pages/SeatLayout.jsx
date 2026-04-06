@@ -19,6 +19,7 @@ function SeatLayout() {
   const [selectedTime, setSelectedTime] = useState(null)
   const [show, setShow] = useState(null)
   const [occupiedSeats, setOccupiedSeats] = useState([])
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -87,6 +88,7 @@ function SeatLayout() {
   }
 
   const bookTickets = async() => {
+    setLoading(true);
    try {
      if(!user) return toast.error("Please login to book tickets");
 
@@ -100,8 +102,10 @@ function SeatLayout() {
       }else {
         toast.error(data.message)
       }
+      setLoading(false);
    } catch (error) {
     console.log("error in book tickets", error)
+    setLoading(false);
    }
   }
 
@@ -157,7 +161,7 @@ function SeatLayout() {
         <button
           className="flex items-center gap-1 mt-20 px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer active:scale-95"
           onClick={bookTickets}>
-          Proceed to Checkout
+          {loading ? "Proceed..." : "Proceed to Checkout"}
           <ArrowRightIcon strokeWidth={3} className="w-4 h-4" />
         </button>
       </div>
