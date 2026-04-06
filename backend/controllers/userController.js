@@ -4,10 +4,12 @@
 import { clerkClient } from "@clerk/express";
 import Booking from "../models/Booking.js";
 import Movie from "../models/Movie.js";
+import { syncUserFromClerk } from "../utils/syncUserFromClerk.js";
 
 export const getUserBookings = async (req, res) => {
     try {
         const user = req.auth().userId;
+        await syncUserFromClerk(user);
 
         const bookings = await Booking.find({ user }).populate({
             path: 'show',
@@ -29,6 +31,7 @@ export const updateFavouriteMovie = async (req, res) => {
 
         const { movieId } = req.body;
         const userId = req.auth().userId;
+        await syncUserFromClerk(userId);
 
         const user = await clerkClient.users.getUser(userId);
 
@@ -56,7 +59,9 @@ export const updateFavouriteMovie = async (req, res) => {
 
 export const getFavouriteMovies = async (req, res) => {
     try {
-          const user = await clerkClient.users.getUser(req.auth().userId);
+          const userId = req.auth().userId;
+          await syncUserFromClerk(userId);
+          const user = await clerkClient.users.getUser(userId);
           const favorites = user.privateMetadata.favorites;
 
           //getting movies from database

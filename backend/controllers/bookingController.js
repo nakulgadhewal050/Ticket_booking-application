@@ -5,6 +5,7 @@ import stripe from "stripe"
 import Booking from "../models/Booking.js";
 import Show from "../models/Show.js";
 import { inngest } from "../inngest/index.js";
+import { syncUserFromClerk } from "../utils/syncUserFromClerk.js";
 
 export const checkSeatAvailability = async (showId, selectedSeats) => {
     try {
@@ -25,6 +26,8 @@ export const checkSeatAvailability = async (showId, selectedSeats) => {
 export const createBooking = async (req, res) => {
     try {
         const { userId } = req.auth();
+        await syncUserFromClerk(userId);
+
         const { showId, selectedSeats } = req.body;
         const { origin } = req.headers;
 
