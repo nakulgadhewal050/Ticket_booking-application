@@ -77,8 +77,14 @@ export const createBooking = async (req, res) => {
             cancel_url: `${origin}/mybookings`,
             line_items: line_items,
             mode: 'payment',
+            client_reference_id: booking._id.toString(),
             metadata: {
                 bookingId: booking._id.toString()
+            },
+            payment_intent_data: {
+                metadata: {
+                    bookingId: booking._id.toString()
+                }
             },
             expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
         })
